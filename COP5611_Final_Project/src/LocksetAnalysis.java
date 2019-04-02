@@ -259,7 +259,7 @@ public class LocksetAnalysis
 		results.add("Memory Location:\tCode Location:");
 
 		// Get each detection of a data race with its memory location and code line location.
-		for (Entry<Integer, Integer> entry : lastMemAccess.entrySet())
+		for (Entry<Integer, Integer> entry : races.entrySet())
 		{
 			// Get the memory and code locations from the HashMap's Key and Value.
 			Integer memory = entry.getKey();
