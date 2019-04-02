@@ -39,16 +39,22 @@ public class LocksetAnalysis
 	// Contains monitoring states of each memory location.
 	public static HashMap<Integer, Integer> memStates;
 	
-	// Contains the thread that first accesses memory.
+	// Contains the thread that first accesses memory location.
 	public static HashMap<Integer, Integer> firstMemAccess;
 	
-	// Contains iids of an operation that accesses memory right before the data race detection.
+	/*
+	 * Contains code line location of an operation that accesses memory right 
+	 * before the data race detection.
+	 */
 	public static HashMap<Integer, Integer> lastMemAccess;
 	
 	// Contains the data race occurrences during lockset analysis.
 	public static HashMap<Integer, Integer> races;
 	
-	// Initialize all variables before using lockset analysis.
+	/*
+	 * Initialize all variables before using the lockset analysis 
+	 * program functions.
+	 */
 	public void intialize()
 	{
 		threadStacks = new HashMap<Integer, LinkedList<Integer>>();	
@@ -87,7 +93,7 @@ public class LocksetAnalysis
 	// Removes a lock from the current thread.
 	public void RemoveLock(Integer thread, Integer lock)
 	{
-		
+		threadLocks.get(thread).remove(lock);
 	}
 	
 	// Add a new memory location to the HashMaps candidateMemLocks and memStates.
