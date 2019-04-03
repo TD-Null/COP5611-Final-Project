@@ -33,15 +33,16 @@ public class LocksetAnalysis
 	public static HashMap<Integer, LinkedList<Integer>> threadStacks;
 			
 	/*
-	 * Represents L(t): Sequence of lock identifiers held by a current thread.
-	 * Let L(t) be the set of locks held by the thread 't'.
+	 * Represents L(t): Sequence of lock identifiers held by a 
+	 * current thread. Let L(t) be the set of locks held by the 
+	 * thread 't'.
 	 */
 	public static HashMap<Integer, LinkedList<Integer>> threadLocks;
 	
 	/*
-	 * Represents C(v): Contains sets of candidate locks for each memory location.
-	 * For each memory location 'v'. initialize C(v) to be the set of all
-	 * candidate locks.
+	 * Represents C(v): Contains sets of candidate locks for each 
+	 * memory location. For each memory location 'v', initialize C(v) 
+	 * to be the set of all candidate locks.
 	 */
 	public static HashMap<Integer, HashSet<Integer>> candidateMemLocks;
 	
@@ -61,7 +62,7 @@ public class LocksetAnalysis
 	public static HashMap<Integer, Integer> firstMemAccess;
 	
 	/*
-	 * Contains code line locations of a read/write operation 
+	 * Contains code line locations of each read/write operation 
 	 * that accesses the memory location. This will be used to
 	 * record the read/write operations that occur right before 
 	 * the data race detection.
@@ -98,13 +99,16 @@ public class LocksetAnalysis
 		// Contains a temporary LinkedList for the locks of threads.
 		LinkedList<Integer> locks = new LinkedList<Integer>();
 		
-		// Insert the thread identifier and its new empty stack and lock set.
+		/* 
+		 * Insert the new thread into the HashMaps with its 
+		 * identifier and its empty stack and lock set.
+		 */
 		threadStacks.put(threadID, stacks);
 		threadLocks.put(threadID, locks);
 	}
 	
 	/*
-	 * Adds a stack or the iid of the method enter execution 
+	 * This function adds a stack or the iid of a method enter execution 
 	 * to the current thread.
 	 */
 	public void AddStack(Integer thread, Integer stack)
@@ -136,21 +140,31 @@ public class LocksetAnalysis
 	/*
 	 * This function adds a new memory location that will 
 	 * be read/written to during multithreading. Each memory 
-	 * location will have its own set of candidate locks.
+	 * location will have its own set of candidate locks 
+	 * during multithreading.
 	 */
 	public void AddMemory(Integer memory)
 	{
-		
+		/*
+		 * Contains a temporary HashSet for the candidate 
+		 * locks of a memory location.
+		 */
 		HashSet<Integer> locks = new HashSet<Integer>();
 		
+		/*
+		 * Insert the new memory location into the HashMap
+		 * with its location and its empty set of candidate
+		 * locks. Also, during intialization of each new
+		 * memory location, the state must be VIRGIN.
+		 */
 		candidateMemLocks.put(memory, locks);
 		memStates.put(memory, VIRGIN);
 	}
 	
 	/*
-	 * Adds a candidate lock to the current memory location. Use this
-	 * function to initialize all memory locations to the set of all
-	 * candidate locks before multithreading starts.
+	 * This function adds a candidate lock to the current memory location. 
+	 * Use this function to initialize all memory locations to the set of 
+	 * all candidate locks before multithreading starts.
 	 */
 	public void AddMemLock(Integer memory, Integer lock)
 	{
@@ -308,6 +322,12 @@ public class LocksetAnalysis
 			}
 		}
 		
+		/*
+		 * Record the last read/write operation that accesses
+		 * the current memory location by putting the memory
+		 * location along with the code line location of where
+		 * the operation occurs into the Hashmap.
+		 */
 		lastMemAccess.put(memory, location);
 	}
 	
@@ -321,21 +341,32 @@ public class LocksetAnalysis
 	 */
 	private boolean IntersectLocks(Integer memory, Integer thread)
 	{
-		// Get the current memory's candidate locks.
+		/*
+		 * Get the current memory's candidate locks, C(v), where
+		 * 'v' is the current memory location.
+		 */
 		HashSet<Integer> memLocks = candidateMemLocks.get(memory);
 		
-		// Get the current thread's locks.
+		/*
+		 * Get the current thread's locks, L(t), where the 't'
+		 * is the current thread.
+		 */
 		LinkedList<Integer> currThreadLocks = threadLocks.get(thread);
 		
 		/*
-		 * Used to contain the intersection between the memory's 
-		 * candidate locks and current thread's locks.
+		 * Used to contain the intersection result between the 
+		 * memory's candidate locks, C(v), and the current thread's 
+		 * locks, L(t).
 		 */
 		HashSet<Integer> intersectLocks = new HashSet<Integer>();
 		
 		/*
-		 * Intersection Operation: Add the locks to the HashSet 
-		 * if the lock is in both C(v) and L(t).
+		 * Represents the Intersection Operation: 
+		 * Add the locks to the HashSet if the lock is in 
+		 * both C(v) and L(t), the candidate locks of the
+		 * current memory location 'v' and the locks currently
+		 * held by the current thread 't'. Iterate through each
+		 * lock in C(v) and check if it is contained in L(t).
 		 */
 		for(Integer lock : memLocks)
 		{
@@ -346,18 +377,28 @@ public class LocksetAnalysis
 		}
 		
 		/*
-		 * Have C(v) equal the intersection of the candidate locks of
-		 * C(v) and the thread locks of L(t).
+		 * Have C(v) equal the intersection of the candidate 
+		 * locks of the current memory location 'v' of C(v) and 
+		 * the thread locks held by the thread 't' of L(t).
 		 */
 		candidateMemLocks.put(memory, intersectLocks);
 		
-		// Return false if C(v) = (Empty Set) after C(v) L(t).
+		/*
+		 * Have the function return false if C(v) = { }
+		 * after intersecting the candidate locks in C(v) 
+		 * with the locks held by the current thread in L(t).
+		 * This means that a data race is detected.
+		 */
 		if(memLocks.isEmpty())
 		{
 			return false;
 		}
 		
-		// Else, return true if the resulting intersection is not an empty set.
+		/*
+		 * Else, have the function return true if the 
+		 * resulting intersection of C(v) and L(t) is 
+		 * not an empty set.
+		 */
 		return true;
 	}
 	
