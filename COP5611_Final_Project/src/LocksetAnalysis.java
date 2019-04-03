@@ -27,24 +27,44 @@ public class LocksetAnalysis
 	public static final Integer SHARED = 2;
 	public static final Integer SHARED_MODIFIED = 3;
 	
-	// Contains sequence of iids on method executions.
+	/*
+	 * Contains sequence of iids on method executions.
+	 */
 	public static HashMap<Integer, LinkedList<Integer>> threadStacks;
 			
-	// Represents L(t): Sequence of lock identifiers held by a current thread.
+	/*
+	 * Represents L(t): Sequence of lock identifiers held by a current thread.
+	 * Let L(t) be the set of locks held by the thread 't'.
+	 */
 	public static HashMap<Integer, LinkedList<Integer>> threadLocks;
 	
-	// Represents C(v): Contains sets of candidate locks for each memory.
+	/*
+	 * Represents C(v): Contains sets of candidate locks for each memory location.
+	 * For each memory location 'v'. initialize C(v) to be the set of all
+	 * candidate locks.
+	 */
 	public static HashMap<Integer, HashSet<Integer>> candidateMemLocks;
 	
-	// Contains monitoring states of each memory location.
+	/*
+	 * Contains monitoring states of each memory location during
+	 * multithreading. During each read/write operation, change the
+	 * memory states accordingly to the lock discipline.
+	 */
 	public static HashMap<Integer, Integer> memStates;
 	
-	// Contains the thread that first accesses memory location.
+	/*
+	 * Contains the thread that first accesses memory location.
+	 * This variable will be used to record the first thread
+	 * that accesses the memory location and be checked if a new
+	 * thread is accessing the memory location.
+	 */
 	public static HashMap<Integer, Integer> firstMemAccess;
 	
 	/*
-	 * Contains code line location of an operation that accesses memory right 
-	 * before the data race detection.
+	 * Contains code line locations of a read/write operation 
+	 * that accesses the memory location. This will be used to
+	 * record the read/write operations that occur right before 
+	 * the data race detection.
 	 */
 	public static HashMap<Integer, Integer> lastMemAccess;
 	
@@ -66,7 +86,10 @@ public class LocksetAnalysis
 		races = new HashMap<Integer, Integer>();
 	}
 	
-	// Add a new thread from the test to the HashMaps stacks and locks.
+	/*
+	 * This function adds a new thread from the test to the 
+	 * HashMaps stacks and locks.
+	 */
 	public void AddThread(Integer threadID)
 	{
 		// Contains a temporary LinkedList for the stacks and locks of threads.
@@ -78,25 +101,40 @@ public class LocksetAnalysis
 		threadLocks.put(threadID, lock);
 	}
 	
-	// Adds a stack or the iid of the method enter execution to the current thread.
+	/*
+	 * Adds a stack or the iid of the method enter execution 
+	 * to the current thread.
+	 */
 	public void AddStack(Integer thread, Integer stack)
 	{
 		threadStacks.get(thread).add(stack);
 	}
 	
-	// Adds a lock to the current thread.
+	/*
+	 * This function adds a lock to the current thread 
+	 * during multithreading. This function will be used 
+	 * when a lock is set on a thread.
+	 */
 	public void AddLock(Integer thread, Integer lock)
 	{
 		threadLocks.get(thread).add(lock);
 	}
 	
-	// Removes a lock from the current thread.
+	/*
+	 * This function removes a lock from the current thread 
+	 * during multithreading. This function will be used 
+	 * when a lock is removed or unlocked on a thread.
+	 */
 	public void RemoveLock(Integer thread, Integer lock)
 	{
 		threadLocks.get(thread).remove(lock);
 	}
 	
-	// Add a new memory location to the HashMaps candidateMemLocks and memStates.
+	/*
+	 * Add a new memory location that will be read/written to
+	 * during multithreading. Each memory location will have its
+	 * own set of candidate locks.
+	 */
 	public void AddMemory(Integer memory)
 	{
 		HashSet<Integer> locks = new HashSet<Integer>();
@@ -105,7 +143,11 @@ public class LocksetAnalysis
 		memStates.put(memory, VIRGIN);
 	}
 	
-	// Adds a candidate lock to the current memory location.
+	/*
+	 * Adds a candidate lock to the current memory location. Use this
+	 * function to initialize all memory locations to the set of all
+	 * candidate locks before multithreading starts.
+	 */
 	public void AddMemLock(Integer memory, Integer lock)
 	{
 		candidateMemLocks.get(memory).add(lock);
@@ -113,7 +155,7 @@ public class LocksetAnalysis
 	
 	/*
 	 * Check the memory state during each read/write operation of the variable.
-	 * The memory identifier, thread identifier, and code line location should
+	 * The memory location identifier, thread identifier, and code line location should
 	 * be given during each read/write operation. The boolean variable read_write
 	 * will represent if a read (false) or write (true) operation was done on the
 	 * memory.
@@ -123,7 +165,11 @@ public class LocksetAnalysis
 		// Get the current state of given memory.
 		Integer currentState = memStates.get(memory);
 		
-		// State changes when the current state of the memory is VIRGIN.
+		/*
+		 * State changes when the current state of 
+		 * the memory location is VIRGIN:
+		 * 1) If the 
+		 */
 		if(currentState == VIRGIN)
 		{
 			if(read_write)
@@ -133,7 +179,11 @@ public class LocksetAnalysis
 			}
 		}
 		
-		// State changes when the current state of the memory is EXCLUSIVE.
+		/*
+		 * State changes when the current state of the 
+		 * memory location is EXCLUSIVE:
+		 * 1)
+		 */
 		else if(currentState == EXCLUSIVE)
 		{
 			if(firstMemAccess.get(memory) != thread)
@@ -155,7 +205,11 @@ public class LocksetAnalysis
 			}
 		}
 		
-		// State changes when the current state of the memory is SHARED.
+		/*
+		 * State changes when the current state of the 
+		 * memory location is SHARED:
+		 * 1)
+		 */
 		else if(currentState == SHARED)
 		{
 			if(read_write)
@@ -172,7 +226,10 @@ public class LocksetAnalysis
 			}
 		}
 		
-		// State changes when the current state of the memory is SHARED-MODIFIED.
+		/* 
+		 * State changes when the current state of the 
+		 * memory location is SHARED-MODIFIED.
+		 */
 		else if(currentState == SHARED_MODIFIED)
 		{
 			if(IntersectLocks(memory, thread))
@@ -241,7 +298,10 @@ public class LocksetAnalysis
 	
 	/*
 	 * This function returns the results of detecting data races during
-	 * the runtime of the multithreaded program.
+	 * the runtime of the multithreaded program. These results will be
+	 * given an ArrayList of Strings to be used by the testing program,
+	 * which contain the number of data race detections and the memory
+	 * and code locations of where the data races occur.
 	 */
 	public ArrayList<String> Results()
 	{
