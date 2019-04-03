@@ -362,8 +362,9 @@ public class LocksetAnalysis
 	}
 	
 	/*
-	 * When a race condition is detected from the algorithm, add the
-	 * memory location and the code line location of where it occurred.
+	 * This function will be called when a race condition is detected 
+	 * from the algorithm. This function adds the memory location and 
+	 * the code line location of where the data race has occurred.
 	 */
 	private void RaceDetection(Integer memory, Integer location)
 	{
