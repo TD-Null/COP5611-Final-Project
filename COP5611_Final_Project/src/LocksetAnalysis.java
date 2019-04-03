@@ -1,7 +1,7 @@
 /*
  * Timothy Deligero
  * Apurv Parekh
- * COP5611 Final Project: Data Race Detection
+ * COP5611 Final Project: Dynamic Data Race Detection
  */
 
 import java.io.*;
@@ -206,6 +206,10 @@ public class LocksetAnalysis
 		 */
 		if(currentState == VIRGIN)
 		{
+			/*
+			 * Check if the operation to the memory location
+			 * of a variable is a read/write operation.
+			 */
 			if(read_write)
 			{
 				memStates.put(memory, EXCLUSIVE);
@@ -246,6 +250,10 @@ public class LocksetAnalysis
 		{
 			if(firstMemAccess.get(memory) != thread)
 			{
+				/*
+				 * Check if the operation to the memory location
+				 * of a variable is a read/write operation.
+				 */
 				if(read_write)
 				{
 					memStates.put(memory, SHARED_MODIFIED);
@@ -288,6 +296,10 @@ public class LocksetAnalysis
 		 */
 		else if(currentState == SHARED)
 		{
+			/*
+			 * Check if the operation to the memory location
+			 * of a variable is a read/write operation.
+			 */
 			if(read_write)
 			{
 				if(IntersectLocks(memory, thread))

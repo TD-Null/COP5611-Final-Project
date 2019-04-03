@@ -1,7 +1,7 @@
 /*
  * Timothy Deligero
  * Apurv Parekh
- * COP5611 Final Project: Data Race Detection
+ * COP5611 Final Project: Dynamic Data Race Detection
  */
 
 import java.io.*;
