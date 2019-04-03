@@ -312,8 +312,12 @@ public class LocksetAnalysis
 	}
 	
 	/*
-	 * Intersect the set of locks between the memory's candidate locks 
-	 * and the current thread's locks.
+	 * This function will be used to intersect the candidate locks
+	 * of the current memory location, C(v), and the locks of the
+	 * current thread, L(t), where 'v' is the memory location, and
+	 * 't' is the current thread. The function will also check if
+	 * the resulting intersection is an empty set, which would mean
+	 * that a data race is detected. 
 	 */
 	private boolean IntersectLocks(Integer memory, Integer thread)
 	{
@@ -330,8 +334,8 @@ public class LocksetAnalysis
 		HashSet<Integer> intersectLocks = new HashSet<Integer>();
 		
 		/*
-		 * Intersection Operation: Add the locks to the HashSet if the lock 
-		 * is in both C(v) and L(t).
+		 * Intersection Operation: Add the locks to the HashSet 
+		 * if the lock is in both C(v) and L(t).
 		 */
 		for(Integer lock : memLocks)
 		{
