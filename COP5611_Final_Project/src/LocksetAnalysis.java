@@ -88,17 +88,19 @@ public class LocksetAnalysis
 	
 	/*
 	 * This function adds a new thread from the test to the 
-	 * HashMaps stacks and locks.
+	 * HashMaps stacks and locks. 
 	 */
 	public void AddThread(Integer threadID)
 	{
-		// Contains a temporary LinkedList for the stacks and locks of threads.
-		LinkedList<Integer> stack = new LinkedList<Integer>();
-		LinkedList<Integer> lock = new LinkedList<Integer>();
+		// Contains a temporary LinkedList for the stacks of threads.
+		LinkedList<Integer> stacks = new LinkedList<Integer>();
+		
+		// Contains a temporary LinkedList for the locks of threads.
+		LinkedList<Integer> locks = new LinkedList<Integer>();
 		
 		// Insert the thread identifier and its new empty stack and lock set.
-		threadStacks.put(threadID, stack);
-		threadLocks.put(threadID, lock);
+		threadStacks.put(threadID, stacks);
+		threadLocks.put(threadID, locks);
 	}
 	
 	/*
@@ -113,7 +115,7 @@ public class LocksetAnalysis
 	/*
 	 * This function adds a lock to the current thread 
 	 * during multithreading. This function will be used 
-	 * when a lock is set on a thread.
+	 * when a lock is set on a certain thread.
 	 */
 	public void AddLock(Integer thread, Integer lock)
 	{
@@ -123,7 +125,8 @@ public class LocksetAnalysis
 	/*
 	 * This function removes a lock from the current thread 
 	 * during multithreading. This function will be used 
-	 * when a lock is removed or unlocked on a thread.
+	 * when a lock is removed or unlocked on a certain 
+	 * thread.
 	 */
 	public void RemoveLock(Integer thread, Integer lock)
 	{
@@ -131,12 +134,13 @@ public class LocksetAnalysis
 	}
 	
 	/*
-	 * Add a new memory location that will be read/written to
-	 * during multithreading. Each memory location will have its
-	 * own set of candidate locks.
+	 * This function adds a new memory location that will 
+	 * be read/written to during multithreading. Each memory 
+	 * location will have its own set of candidate locks.
 	 */
 	public void AddMemory(Integer memory)
 	{
+		
 		HashSet<Integer> locks = new HashSet<Integer>();
 		
 		candidateMemLocks.put(memory, locks);
@@ -166,9 +170,25 @@ public class LocksetAnalysis
 		Integer currentState = memStates.get(memory);
 		
 		/*
-		 * State changes when the current state of 
+		 * State changes made when the current state of 
 		 * the memory location is VIRGIN:
-		 * 1) If the 
+		 * 
+		 * 1) If the next operation after initialization
+		 * is a read operation, then the current state of
+		 * the memory location will remain as VIRGIN.
+		 * 
+		 * 2) If the next operation after initialization is
+		 * a write operation, then the current state of 
+		 * the memory location will be changed to EXCLUSIVE 
+		 * and the thread that first accesses the memory 
+		 * location will be recorded.
+		 * 
+		 * 3) C(v), or the candidate locks for the memory
+		 * location of variable 'v' will still remain
+		 * during initialization in the VIRGIN state and
+		 * will not be update when entering the EXCLUSIVE
+		 * state.
+		 * 
 		 */
 		if(currentState == VIRGIN)
 		{
@@ -180,9 +200,33 @@ public class LocksetAnalysis
 		}
 		
 		/*
-		 * State changes when the current state of the 
+		 * State changes made when the current state of the 
 		 * memory location is EXCLUSIVE:
-		 * 1)
+		 * 
+		 * 1) If the next read/write operation is in
+		 * the first thread that accessed the memory
+		 * location, then the state of the memory location
+		 * will remain EXCLUSIVE and C(v) will not be
+		 * updated.
+		 * 
+		 * 2) If the next read operation is in an new
+		 * thread that accesses the memory location,
+		 * then the current state of the memory location
+		 * will be changed to SHARED and C(v) will 
+		 * be updated to have candidate locks equal to
+		 * the intersection of C(v) and L(t), or locks
+		 * of the current thread.
+		 * 
+		 * 3) If the next write operation is in an new
+		 * thread that accesses the memory location,
+		 * then the current state of the memory location
+		 * will be changed to SHARED-MODIFIED and C(v) will 
+		 * be updated to have candidate locks equal to
+		 * the intersection of C(v) and L(t), or locks
+		 * of the current thread. If the resulting C(v)
+		 * is an empty set, then a data race detection
+		 * is reported.
+		 * 
 		 */
 		else if(currentState == EXCLUSIVE)
 		{
@@ -206,9 +250,27 @@ public class LocksetAnalysis
 		}
 		
 		/*
-		 * State changes when the current state of the 
+		 * State changes made when the current state of the 
 		 * memory location is SHARED:
-		 * 1)
+		 * 
+		 * 1) If the next operation is a read operation
+		 * that accesses the memory location, then the 
+		 * current state of the memory location
+		 * will be remain as SHARED and C(v) will 
+		 * be updated to have candidate locks equal to
+		 * the intersection of C(v) and L(t), or locks
+		 * of the current thread.
+		 * 
+		 * 2) If the next operation is a write operation 
+		 * that accesses the memory location, then the 
+		 * current state of the memory location will be
+		 * changed to SHARED-MODIFIED and C(v) will 
+		 * be updated to have candidate locks equal to
+		 * the intersection of C(v) and L(t), or locks
+		 * of the current thread. If the resulting C(v)
+		 * is an empty set, then a data race detection
+		 * is reported.
+		 * 
 		 */
 		else if(currentState == SHARED)
 		{
@@ -227,8 +289,16 @@ public class LocksetAnalysis
 		}
 		
 		/* 
-		 * State changes when the current state of the 
-		 * memory location is SHARED-MODIFIED.
+		 * State changes made when the current state of the 
+		 * memory location is SHARED-MODIFIED:
+		 * 
+		 * 1) For the next read/write operation, C(v) 
+		 * will be updated to have candidate locks equal 
+		 * to the intersection of C(v) and L(t), or locks
+		 * of the current thread. If the resulting C(v)
+		 * is an empty set, then a data race detection
+		 * is reported.
+		 * 
 		 */
 		else if(currentState == SHARED_MODIFIED)
 		{
@@ -289,7 +359,7 @@ public class LocksetAnalysis
 	
 	/*
 	 * When a race condition is detected from the algorithm, add the
-	 * memory and the code line location of where it occurred.
+	 * memory location and the code line location of where it occurred.
 	 */
 	private void RaceDetection(Integer memory, Integer location)
 	{
