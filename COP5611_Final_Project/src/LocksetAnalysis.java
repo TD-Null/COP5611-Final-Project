@@ -427,8 +427,8 @@ public class LocksetAnalysis
 	/*
 	 * This function returns the results of detecting data races during
 	 * the runtime of the multithreaded program. These results will be
-	 * given an ArrayList of Strings to be used by the testing program,
-	 * which contain the number of data race detections and the memory
+	 * given in an ArrayList of Strings to be used by the testing program,
+	 * which contains the number of data race detections and the memory
 	 * and code locations of where the data races occur.
 	 */
 	public ArrayList<String> Results()
@@ -449,11 +449,17 @@ public class LocksetAnalysis
 		// Get each detection of a data race with its memory location and code line location.
 		for (Entry<Integer, Integer> entry : races.entrySet())
 		{
-			// Get the memory and code locations from the HashMap's Key and Value.
+			/*
+			 * Get the memory and code locations from the 
+			 * HashMap's Key and Value.
+			 */
 			Integer memory = entry.getKey();
 			Integer code = entry.getValue();
 			
-			// Add the data race occurrence location as a string in the results.
+			/*
+			 * Add the data race occurrence location as a string 
+			 * in the results ArrayList.
+			 */
 			results.add(memory + "\t" + code);
 		}
 		
