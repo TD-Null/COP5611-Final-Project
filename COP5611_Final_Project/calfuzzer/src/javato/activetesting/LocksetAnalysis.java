@@ -455,6 +455,9 @@ public class LocksetAnalysis extends AnalysisImpl
 		lastAccessLoc.put(memory, iid);
 	}
 
+	/*
+     * This function will execute after every read operation.
+     */
 	public void readAfter(Integer iid, Integer thread, Long memory, boolean isVolatile)
 	{
 		
@@ -608,6 +611,9 @@ public class LocksetAnalysis extends AnalysisImpl
 		lastAccessLoc.put(memory, iid);
 	}
 
+	/*
+     * This function will execute after every write operation.
+     */
 	public void writeAfter(Integer iid, Integer thread, Long memory, boolean isVolatile)
 	{
 
