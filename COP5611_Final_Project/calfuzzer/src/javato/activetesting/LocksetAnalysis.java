@@ -103,7 +103,7 @@ public class LocksetAnalysis extends AnalysisImpl
 	 * are detected during lockset analysis and when the target program is executed
 	 * and running.
 	 */
-	public HashMap<Long /*memory*/, Integer /*iid*/> raceDetections = new HashMap<Long, Integer>();
+	public HashMap<Long /*memory*/, Integer /*iid*/> raceDetections = new HashMap<Long, String>();
 	/* -- Data per memory */
 
 	/*
@@ -120,7 +120,7 @@ public class LocksetAnalysis extends AnalysisImpl
 		state = new HashMap<Long, MemoryState>();
 		firstThread = new HashMap<Long, Integer>();
 		lastAccessLoc = new HashMap<Long, Integer>();
-		raceDetections = new HashMap<Long, Integer>();
+		raceDetections = new HashMap<Long, String>();
 	}
 
 	/*
@@ -675,14 +675,14 @@ public class LocksetAnalysis extends AnalysisImpl
 		results.add("Memory Location:\tCode Location:");
 
 		// Get each detection of a data race with its memory location and code line location.
-		for (Entry<Long, Integer> entry : raceDetections.entrySet())
+		for (Entry<Long, String> entry : raceDetections.entrySet())
 		{
 			/*
 			 * Get the memory and code locations from the 
 			 * HashMap's Key and Value.
 			 */
 			Long memory = entry.getKey();
-			Integer code = entry.getValue();
+			String code = entry.getValue();
 			
 			// Print the data race's memory location and code line location.
 			System.out.println(memory + "\t" + code);
