@@ -660,7 +660,7 @@ public class LocksetAnalysis extends AnalysisImpl
 	}
 
 	/*
-	 * This function will execute when the taget program terminates.
+	 * This function will execute when the target program terminates.
 	 * This function will analyze the monitored data and print out the 
 	 * results. These results will contain the number of data race 
 	 * detections and the memory and code locations of where the 
