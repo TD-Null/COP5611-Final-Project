@@ -104,7 +104,7 @@ public class LocksetAnalysis extends AnalysisImpl
 	 * are detected during lockset analysis and when the target program is executed
 	 * and running.
 	 */
-	public HashMap<Long /*memory*/, Integer /*iid*/> raceDetections = new HashMap<Long, String>();
+	public HashMap<Long /*memory*/, String /*iid*/> raceDetections = new HashMap<Long, String>();
 	/* -- Data per memory */
 
 	/*
