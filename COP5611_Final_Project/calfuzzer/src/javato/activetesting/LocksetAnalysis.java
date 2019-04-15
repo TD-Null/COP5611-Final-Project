@@ -1,6 +1,7 @@
 package javato.activetesting;
 
-import java.util.* ;
+import java.util.*;
+import java.util.Map.Entry;
 
 import javato.activetesting.activechecker.ActiveChecker;
 import javato.activetesting.analysis.AnalysisImpl;
@@ -672,7 +673,7 @@ public class LocksetAnalysis extends AnalysisImpl
 		System.out.println("Total # of data race detections: " + lastAccessLoc.size());
 		
 		// Identify the memory locations and code line locations of each data race.
-		results.add("Memory Location:\tCode Location:");
+		System.out.println("Memory Location:\tCode Location:");
 
 		// Get each detection of a data race with its memory location and code line location.
 		for (Entry<Long, String> entry : raceDetections.entrySet())
