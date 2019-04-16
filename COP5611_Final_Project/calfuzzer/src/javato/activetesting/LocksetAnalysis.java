@@ -646,9 +646,18 @@ public class LocksetAnalysis extends AnalysisImpl
 			 */
 			HashSet<Integer> lockset = new HashSet<Integer>();
 			
-			for(int i = 0; i < heldLocks.get(thread).size(); i++)
+			if(!heldLocks.containsKey(thread))
 			{
-				lockset.add(heldLocks.get(thread).get(i));
+				for(int i = 0; i < heldLocks.get(thread).size(); i++)
+				{
+					lockset.add(heldLocks.get(thread).get(i));
+				}
+			}
+			
+			else
+			{
+				LinkedList<Integer> locks = new LinkedList<Integer>();
+				heldLocks.put(thread, locks);
 			}
 			
 			candidates.put(memory, lockset);
