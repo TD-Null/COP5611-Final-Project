@@ -226,7 +226,7 @@ public class LocksetAnalysis extends AnalysisImpl
 				 * set of locks.
 				 */
 				LinkedList<Integer> locks = new LinkedList<Integer>();
-				stacks.put(thread, locks);
+				heldLocks.put(thread, locks);
 			}
 			
 			/*
@@ -282,7 +282,7 @@ public class LocksetAnalysis extends AnalysisImpl
 				 * set of locks.
 				 */
 				LinkedList<Integer> locks = new LinkedList<Integer>();
-				stacks.put(thread, locks);
+				heldLocks.put(thread, locks);
 			}
 			
 			/*
@@ -644,7 +644,13 @@ public class LocksetAnalysis extends AnalysisImpl
 			 * held locks of the current thread should just be the
 			 * same locks held by the current thread.
 			 */
-			HashSet<Integer> lockset = new HashSet<Integer>(heldLocks.get(thread));
+			HashSet<Integer> lockset = new HashSet<Integer>();
+			
+			for(int i = 0; i < heldLocks.get(thread).size(); i++)
+			{
+				lockset.add(heldLocks.get(thread).get(i));
+			}
+			
 			candidates.put(memory, lockset);
 		}
 		
