@@ -646,6 +646,7 @@ public class LocksetAnalysis extends AnalysisImpl
 			 */
 			HashSet<Integer> lockset = new HashSet<Integer>();
 			
+			// Check if the HashMap contains the thread already.
 			if(!heldLocks.containsKey(thread))
 			{
 				for(int i = 0; i < heldLocks.get(thread).size(); i++)
