@@ -655,6 +655,7 @@ public class LocksetAnalysis extends AnalysisImpl
 				}
 			}
 			
+			// Add a lockset to the thread is there isn't one added already.
 			else
 			{
 				LinkedList<Integer> locks = new LinkedList<Integer>();
