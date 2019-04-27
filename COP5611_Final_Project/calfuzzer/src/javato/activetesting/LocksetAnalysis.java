@@ -268,11 +268,6 @@ public class LocksetAnalysis extends AnalysisImpl
 	{
 		synchronized(heldLocks)
 		{
-			// Implement here.
-			// You can assume that unlockAfter(iid, thread, lock) is executed
-			// only after lockBefore(iid, thread, lock) had been executed earlier.
-			// Your code must properly handle the recursive locking case.
-
 			// Check if there is a lock set for the current thread.
 			if(!heldLocks.containsKey(thread))
 			{
@@ -647,7 +642,7 @@ public class LocksetAnalysis extends AnalysisImpl
 			HashSet<Integer> lockset = new HashSet<Integer>();
 			
 			// Check if the HashMap contains the thread already.
-			if(!heldLocks.containsKey(thread))
+			if(heldLocks.containsKey(thread))
 			{
 				for(int i = 0; i < heldLocks.get(thread).size(); i++)
 				{
@@ -662,6 +657,7 @@ public class LocksetAnalysis extends AnalysisImpl
 				heldLocks.put(thread, locks);
 			}
 			
+			// Update the candidate lockset for the memory location.
 			candidates.put(memory, lockset);
 		}
 		
@@ -673,6 +669,13 @@ public class LocksetAnalysis extends AnalysisImpl
 		 */
 		else
 		{
+			// Check if the HashMap contains the thread already. If not, add a lockset to the thread.
+			if(!heldLocks.containsKey(thread))
+			{
+				LinkedList<Integer> locks = new LinkedList<Integer>();
+				candidates.get(memory).retainAll(heldLocks.get(thread));
+			}
+			
 			candidates.get(memory).retainAll(heldLocks.get(thread));
 		}
 	}
