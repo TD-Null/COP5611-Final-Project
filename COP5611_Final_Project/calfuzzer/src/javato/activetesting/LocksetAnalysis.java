@@ -673,7 +673,7 @@ public class LocksetAnalysis extends AnalysisImpl
 			if(!heldLocks.containsKey(thread))
 			{
 				LinkedList<Integer> locks = new LinkedList<Integer>();
-				candidates.get(memory).retainAll(heldLocks.get(thread));
+				heldLocks.put(thread, locks);
 			}
 			
 			candidates.get(memory).retainAll(heldLocks.get(thread));
